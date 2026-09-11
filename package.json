@@ -1,0 +1,19 @@
+{
+  "name": "langfuse-lead-qualifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langfuse/openai": "^5.11.1",
+    "@langfuse/otel": "^5.11.1",
+    "@opentelemetry/sdk-node": "^0.222.0",
+    "dotenv": "^17.4.2",
+    "openai": "^7.15.0"
+  }
+}
