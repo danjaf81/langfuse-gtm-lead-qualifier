@@ -1,0 +1,154 @@
+[
+  {
+    "company_name": "TravelStack",
+    "industry": "Travel SaaS",
+    "business_model": "B2B",
+    "company_size": 120,
+    "product": "API infrastructure for hotel booking platforms",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "high-potential"
+  },
+  {
+    "company_name": "HotelConnect",
+    "industry": "Travel Technology",
+    "business_model": "B2B",
+    "company_size": 80,
+    "product": "Hotel inventory API for travel agencies",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "high-potential"
+  },
+  {
+    "company_name": "TripCore",
+    "industry": "Travel SaaS",
+    "business_model": "B2B",
+    "company_size": 250,
+    "product": "Booking infrastructure for fintech and loyalty platforms",
+    "region": "North America",
+    "uses_api": true,
+    "expected_segment": "high-potential"
+  },
+  {
+    "company_name": "StayEngine",
+    "industry": "Hospitality Technology",
+    "business_model": "B2B",
+    "company_size": 45,
+    "product": "API-first accommodation distribution platform",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "high-potential"
+  },
+  {
+    "company_name": "TravelPay",
+    "industry": "Travel Fintech",
+    "business_model": "B2B",
+    "company_size": 160,
+    "product": "Payment infrastructure for travel companies with booking integrations",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "high-potential"
+  },
+
+  {
+    "company_name": "SunnyTrips",
+    "industry": "Online Travel Agency",
+    "business_model": "B2C",
+    "company_size": 70,
+    "product": "Consumer travel booking website",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "medium-potential"
+  },
+  {
+    "company_name": "HotelMarketingPro",
+    "industry": "Hospitality Marketing",
+    "business_model": "B2B",
+    "company_size": 30,
+    "product": "Digital marketing services for independent hotels",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "medium-potential"
+  },
+  {
+    "company_name": "RouteAI",
+    "industry": "Artificial Intelligence",
+    "business_model": "B2B",
+    "company_size": 90,
+    "product": "AI routing software for logistics companies",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "medium-potential"
+  },
+  {
+    "company_name": "BoutiqueBeds",
+    "industry": "Hospitality",
+    "business_model": "B2B",
+    "company_size": 25,
+    "product": "Marketplace connecting boutique hotels with travel advisors",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "medium-potential"
+  },
+  {
+    "company_name": "FinConnect",
+    "industry": "Fintech SaaS",
+    "business_model": "B2B",
+    "company_size": 300,
+    "product": "API infrastructure for payment and banking integrations",
+    "region": "Europe",
+    "uses_api": true,
+    "expected_segment": "medium-potential"
+  },
+
+  {
+    "company_name": "GreenGarden",
+    "industry": "Gardening",
+    "business_model": "B2C",
+    "company_size": 40,
+    "product": "Online store selling plants and gardening equipment",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "low-potential"
+  },
+  {
+    "company_name": "LegalOffice",
+    "industry": "Legal Services",
+    "business_model": "B2B",
+    "company_size": 18,
+    "product": "Traditional legal advisory services",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "low-potential"
+  },
+  {
+    "company_name": "FashionDrop",
+    "industry": "Fashion Ecommerce",
+    "business_model": "B2C",
+    "company_size": 140,
+    "product": "Direct-to-consumer fashion marketplace",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "low-potential"
+  },
+  {
+    "company_name": "FoodLocal",
+    "industry": "Food Delivery",
+    "business_model": "B2C",
+    "company_size": 55,
+    "product": "Local restaurant delivery application",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "low-potential"
+  },
+  {
+    "company_name": "OfficeDesign",
+    "industry": "Interior Design",
+    "business_model": "B2B",
+    "company_size": 22,
+    "product": "Office design and furniture consulting",
+    "region": "Europe",
+    "uses_api": false,
+    "expected_segment": "low-potential"
+  }
+]
