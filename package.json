@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@langfuse/client": "^5.11.1",
     "@langfuse/openai": "^5.11.1",
     "@langfuse/otel": "^5.11.1",
     "@opentelemetry/sdk-node": "^0.222.0",

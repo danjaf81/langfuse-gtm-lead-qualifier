@@ -3,6 +3,7 @@ import fs from "fs";
 
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { LangfuseSpanProcessor } from "@langfuse/otel";
+import { LangfuseClient } from "@langfuse/client";
 import OpenAI from "openai";
 import { observeOpenAI } from "@langfuse/openai";
 
@@ -12,8 +13,20 @@ const sdk = new NodeSDK({
 
 sdk.start();
 
+const langfuse = new LangfuseClient();
+
+const langfusePrompt = await langfuse.prompt.get(
+  "gtm-lead-qualifier",
+  {
+    type: "text",
+    label: "production",
+  }
+);
+
+const systemPrompt = langfusePrompt.compile({});
+
 const openai = observeOpenAI(new OpenAI(), {
-  generationName: "lead-qualifier-hybrid-v3"
+  langfusePrompt,
 });
 
 const companies = JSON.parse(
@@ -60,11 +73,11 @@ function classifyCompany(company) {
     signals: {
       travel: travelSignal,
       b2b: b2bSignal,
-      api: apiSignal
+      api: apiSignal,
     },
     signalCount,
     segment,
-    nextAction
+    nextAction,
   };
 }
 
@@ -85,31 +98,16 @@ for (const company of companies) {
     messages: [
       {
         role: "system",
-        content: `
-You are a GTM lead qualification assistant.
-
-The segment has already been calculated using deterministic business rules.
-
-Your job is only to:
-1. assign a fit_score consistent with the segment
-2. explain the reasoning in maximum 25 words
-
-Score ranges:
-- high-potential: 70-100
-- medium-potential: 40-69
-- low-potential: 0-39
-
-Base your reasoning only on the data provided.
-`
+        content: systemPrompt,
       },
       {
         role: "user",
         content: JSON.stringify({
           company: inputCompany,
           deterministic_segment: deterministic.segment,
-          signals: deterministic.signals
-        })
-      }
+          signals: deterministic.signals,
+        }),
+      },
     ],
 
     response_format: {
@@ -123,20 +121,20 @@ Base your reasoning only on the data provided.
             fit_score: {
               type: "integer",
               minimum: 0,
-              maximum: 100
+              maximum: 100,
             },
             reason: {
-              type: "string"
-            }
+              type: "string",
+            },
           },
           required: [
             "fit_score",
-            "reason"
+            "reason",
           ],
-          additionalProperties: false
-        }
-      }
-    }
+          additionalProperties: false,
+        },
+      },
+    },
   });
 
   const aiResult = JSON.parse(
@@ -147,7 +145,7 @@ Base your reasoning only on the data provided.
     fit_score: aiResult.fit_score,
     segment: deterministic.segment,
     reason: aiResult.reason,
-    next_action: deterministic.nextAction
+    next_action: deterministic.nextAction,
   };
 
   const isCorrect =
