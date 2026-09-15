@@ -1,5 +1,4 @@
 import "dotenv/config";
-
 import fs from "fs";
 
 import { NodeSDK } from "@opentelemetry/sdk-node";
@@ -14,12 +13,60 @@ const sdk = new NodeSDK({
 sdk.start();
 
 const openai = observeOpenAI(new OpenAI(), {
-  generationName: "lead-qualifier-dataset-test"
+  generationName: "lead-qualifier-hybrid-v3"
 });
 
 const companies = JSON.parse(
   fs.readFileSync("./data/companies.json", "utf8")
 );
+
+function classifyCompany(company) {
+  const text = `${company.industry} ${company.product}`.toLowerCase();
+
+  const travelSignal =
+    text.includes("travel") ||
+    text.includes("hospitality") ||
+    text.includes("hotel");
+
+  const b2bSignal =
+    company.business_model === "B2B";
+
+  const apiSignal =
+    company.uses_api === true ||
+    text.includes("api") ||
+    text.includes("integration") ||
+    text.includes("infrastructure");
+
+  const signalCount =
+    Number(travelSignal) +
+    Number(b2bSignal) +
+    Number(apiSignal);
+
+  let segment;
+  let nextAction;
+
+  if (signalCount === 3) {
+    segment = "high-potential";
+    nextAction = "sales_follow_up";
+  } else if (signalCount === 2) {
+    segment = "medium-potential";
+    nextAction = "nurture";
+  } else {
+    segment = "low-potential";
+    nextAction = "ignore";
+  }
+
+  return {
+    signals: {
+      travel: travelSignal,
+      b2b: b2bSignal,
+      api: apiSignal
+    },
+    signalCount,
+    segment,
+    nextAction
+  };
+}
 
 let correct = 0;
 
@@ -29,47 +76,46 @@ for (const company of companies) {
   const inputCompany = { ...company };
   delete inputCompany.expected_segment;
 
+  const deterministic = classifyCompany(inputCompany);
+
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
+    temperature: 0,
 
     messages: [
-  {
-    role: "system",
-    content: `
+      {
+        role: "system",
+        content: `
 You are a GTM lead qualification assistant.
 
-Evaluate companies for a B2B SaaS company selling API infrastructure
-to travel companies.
+The segment has already been calculated using deterministic business rules.
 
-Use these three core fit signals:
+Your job is only to:
+1. assign a fit_score consistent with the segment
+2. explain the reasoning in maximum 25 words
 
-1. The company operates in travel, hospitality, or travel technology.
-2. The company has a B2B business model.
-3. The company uses APIs, integrations, or provides technical infrastructure.
+Score ranges:
+- high-potential: 70-100
+- medium-potential: 40-69
+- low-potential: 0-39
 
-Classification rules:
-
-- high-potential: all three core signals are present
-- medium-potential: exactly two core signals are present
-- low-potential: zero or one core signal is present
-
-Company size and region can influence the fit_score,
-but they must not change the segment classification.
-
-Base the evaluation only on the data provided.
-The reason must be concise, maximum 25 words.
+Base your reasoning only on the data provided.
 `
-  },
-  {
-    role: "user",
-    content: JSON.stringify(inputCompany)
-  }
-], 
+      },
+      {
+        role: "user",
+        content: JSON.stringify({
+          company: inputCompany,
+          deterministic_segment: deterministic.segment,
+          signals: deterministic.signals
+        })
+      }
+    ],
 
     response_format: {
       type: "json_schema",
       json_schema: {
-        name: "lead_qualification",
+        name: "lead_qualification_reasoning",
         strict: true,
         schema: {
           type: "object",
@@ -79,31 +125,13 @@ The reason must be concise, maximum 25 words.
               minimum: 0,
               maximum: 100
             },
-            segment: {
-              type: "string",
-              enum: [
-                "low-potential",
-                "medium-potential",
-                "high-potential"
-              ]
-            },
             reason: {
               type: "string"
-            },
-            next_action: {
-              type: "string",
-              enum: [
-                "ignore",
-                "nurture",
-                "sales_follow_up"
-              ]
             }
           },
           required: [
             "fit_score",
-            "segment",
-            "reason",
-            "next_action"
+            "reason"
           ],
           additionalProperties: false
         }
@@ -111,11 +139,19 @@ The reason must be concise, maximum 25 words.
     }
   });
 
-  const result = JSON.parse(
+  const aiResult = JSON.parse(
     response.choices[0].message.content
   );
 
-  const isCorrect = result.segment === expectedSegment;
+  const result = {
+    fit_score: aiResult.fit_score,
+    segment: deterministic.segment,
+    reason: aiResult.reason,
+    next_action: deterministic.nextAction
+  };
+
+  const isCorrect =
+    result.segment === expectedSegment;
 
   if (isCorrect) {
     correct++;
@@ -126,7 +162,8 @@ The reason must be concise, maximum 25 words.
   );
 }
 
-const accuracy = (correct / companies.length) * 100;
+const accuracy =
+  (correct / companies.length) * 100;
 
 console.log("\n----------------------");
 console.log(`Correct: ${correct}/${companies.length}`);
